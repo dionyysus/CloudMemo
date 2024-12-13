@@ -10,7 +10,7 @@ import SwiftUI
 struct CircleComplete: View {
     @State private var drawingStroke = false
     
-    let strawberry = Color(#colorLiteral(red: 1, green: 0.1857388616, blue: 0.5733950138, alpha: 1))
+    let selectedColor: Color
     
     let animation = Animation
         .easeOut(duration: 1)
@@ -18,7 +18,7 @@ struct CircleComplete: View {
     
     var body: some View {
         ZStack {
-            ring(for: strawberry)
+            ring(for: selectedColor)
             VStack(spacing: 10) {
                 Image(systemName: "checkmark.icloud.fill")
                     .font(.system(size: 50))
@@ -26,7 +26,6 @@ struct CircleComplete: View {
                 Text("Another journal entry down!")
                     .multilineTextAlignment(.center)
                     .font(.caption)
-                    
             }
         }
         .animation(animation, value: drawingStroke)
@@ -52,5 +51,5 @@ struct CircleComplete: View {
 }
 
 #Preview {
-    CircleComplete()
+    CircleComplete(selectedColor: .green)
 }

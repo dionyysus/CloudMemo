@@ -8,8 +8,14 @@
 import SwiftUI
 
 struct StatisticView: View {
+    
+    private func fetchMoodCounts() -> [String: Int] {
+        let moodCountsKey = "moodCounts"
+        return UserDefaults.standard.dictionary(forKey: moodCountsKey) as? [String: Int] ?? [:]
+    }
+    
     var body: some View {
-        VStack() {
+        VStack {
             
             Image(systemName: "flame.fill")
                 .resizable()
@@ -22,9 +28,10 @@ struct StatisticView: View {
             Text("Day Streak")
                 .font(.title)
                 .fontWeight(.bold)
-            Text("you are doing really great!")
+            Text("You are doing really great!")
                 .font(.title2)
                 .fontWeight(.light)
+            
             VStack(spacing: 20) {
                 HStack(spacing: 20) {
                     VStack {
@@ -32,7 +39,7 @@ struct StatisticView: View {
                             Image("awesomecloud")
                                 .resizable()
                                 .scaledToFit()
-                            Text("1")
+                            Text("\(fetchMoodCounts()["Awesome"] ?? 0)")
                                 .font(.caption)
                                 .fontWeight(.bold)
                                 .padding(4)
@@ -51,7 +58,7 @@ struct StatisticView: View {
                             Image("happycloud")
                                 .resizable()
                                 .scaledToFit()
-                            Text("2")
+                            Text("\(fetchMoodCounts()["Happy"] ?? 0)")  // Dynamically show the count for "Happy"
                                 .font(.caption)
                                 .fontWeight(.bold)
                                 .padding(4)
@@ -70,7 +77,7 @@ struct StatisticView: View {
                             Image("okaycloud")
                                 .resizable()
                                 .scaledToFit()
-                            Text("3")
+                            Text("\(fetchMoodCounts()["Okay"] ?? 0)")  // Dynamically show the count for "Okay"
                                 .font(.caption)
                                 .fontWeight(.bold)
                                 .padding(4)
@@ -79,11 +86,9 @@ struct StatisticView: View {
                                 .clipShape(Circle())
                                 .padding([.top, .leading], 5)
                         }
-                        HStack {
-                            Text("Okay")
-                                .font(.caption)
-                                .fontWeight(.light)
-                        }
+                        Text("Okay")
+                            .font(.caption)
+                            .fontWeight(.light)
                     }
                 }
                 
@@ -93,7 +98,7 @@ struct StatisticView: View {
                             Image("sadcloud")
                                 .resizable()
                                 .scaledToFit()
-                            Text("4")
+                            Text("\(fetchMoodCounts()["Sad"] ?? 0)")
                                 .font(.caption)
                                 .fontWeight(.bold)
                                 .padding(4)
@@ -112,7 +117,7 @@ struct StatisticView: View {
                             Image("angrycloud")
                                 .resizable()
                                 .scaledToFit()
-                            Text("5")
+                            Text("\(fetchMoodCounts()["Angry"] ?? 0)")
                                 .font(.caption)
                                 .fontWeight(.bold)
                                 .padding(4)
@@ -131,7 +136,7 @@ struct StatisticView: View {
                             Image("terriblecloud")
                                 .resizable()
                                 .scaledToFit()
-                            Text("6")
+                            Text("\(fetchMoodCounts()["Terrible"] ?? 0)")  // Dynamically show the count for "Terrible"
                                 .font(.caption)
                                 .fontWeight(.bold)
                                 .padding(4)
@@ -155,7 +160,6 @@ struct StatisticView: View {
         .padding()
     }
 }
-
 
 #Preview {
     StatisticView()
