@@ -19,10 +19,10 @@ struct HomeView: View {
     @State private var streak: Int = 0
     
     @State private var navigateToCircleComplete: Bool = false // New state for navigation
-
-
+    
+    
     private let dataKey = "dailyEntries"
-
+    
     let items = [
         ("awesomecloud", "Awesome", Color.green),
         ("happycloud", "Happy", Color.yellow),
@@ -109,7 +109,7 @@ struct HomeView: View {
                                 .fill(Color.black)
                         )
                 }
-
+                
                 .padding()
                 .simultaneousGesture(TapGesture().onEnded {
                     saveDataForToday()
@@ -166,7 +166,7 @@ struct HomeView: View {
         ]
         UserDefaults.standard.set(dailyEntries, forKey: dataKey)
         UserDefaults.standard.set(streak, forKey: "streak") // Save streak
-
+        
         // Save the selected mood color
         if let selectedMood = selectedMood {
             let colorData = try? NSKeyedArchiver.archivedData(withRootObject: UIColor(items[selectedMood].2), requiringSecureCoding: false)
@@ -183,7 +183,7 @@ struct HomeView: View {
         print("Mood counts updated: \(moodCounts)")
         print("Data saved for \(today): \(displayedText), Mood: \(selectedMood ?? -1)")
     }
-
+    
     private func entryExistsForToday() -> Bool {
         let dailyEntries = UserDefaults.standard.dictionary(forKey: dataKey) as? [String: [String: Any]] ?? [:]
         return dailyEntries[today] != nil
@@ -201,7 +201,7 @@ struct HomeView: View {
         UserDefaults.standard.set(mood, forKey: moodKey)
         UserDefaults.standard.set(try? NSKeyedArchiver.archivedData(withRootObject: color, requiringSecureCoding: false), forKey: colorKey)
     }
-
+    
     
     func saveMoodCounts() {
         let moodCountsKey = "moodCounts"
@@ -224,9 +224,8 @@ struct HomeView: View {
            let uiColor = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(colorData) as? UIColor {
             return Color(uiColor)
         }
-        return .gray // Default color
+        return .gray
     }
-
 }
 
 

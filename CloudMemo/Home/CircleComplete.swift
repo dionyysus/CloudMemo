@@ -18,17 +18,20 @@ struct CircleComplete: View {
     var body: some View {
         ZStack {
             ring(for: selectedColor)
-            VStack(spacing: 10) {
+            
+            VStack(spacing: 5) {
                 Image(systemName: "checkmark.icloud.fill")
-                    .font(.system(size: 50))
+                    .font(.system(size: 40))
+                    .foregroundColor(selectedColor)
                 
-                Text("Another journal entry down!")
+                Text("Journal entry complete!")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
                     .multilineTextAlignment(.center)
-                    .font(.caption)
             }
         }
+        .padding(40)
         .animation(animation, value: drawingStroke)
-        .padding(70)
         .onAppear {
             drawingStroke.toggle()
         }
@@ -37,13 +40,13 @@ struct CircleComplete: View {
     
     func ring(for color: Color) -> some View {
         Circle()
-            .stroke(style: StrokeStyle(lineWidth: 16))
-            .foregroundStyle(.tertiary)
+            .stroke(style: StrokeStyle(lineWidth: 12))
+            .foregroundColor(Color.gray.opacity(0.2))
             .overlay {
                 Circle()
                     .trim(from: 0, to: drawingStroke ? 1 : 0)
                     .stroke(color.gradient,
-                            style: StrokeStyle(lineWidth: 16, lineCap: .round))
+                            style: StrokeStyle(lineWidth: 12, lineCap: .round))
             }
             .rotationEffect(.degrees(-90))
     }
