@@ -11,9 +11,8 @@ struct StatisticView: View {
     
     let moodCountsKey = "moodCounts"
     
-    // Use @State to store the mood counts locally
     @State private var moodCounts: [String: Int] = [:]
-
+    
     var body: some View {
         VStack {
             
@@ -34,7 +33,6 @@ struct StatisticView: View {
             
             VStack(spacing: 20) {
                 HStack(spacing: 20) {
-                    // Repeat the same structure for other moods
                     moodCloud(mood: "Awesome", count: moodCounts["Awesome"] ?? 0, color: .green, imageName: "awesomecloud")
                     moodCloud(mood: "Happy", count: moodCounts["Happy"] ?? 0, color: .yellow, imageName: "happycloud")
                     moodCloud(mood: "Okay", count: moodCounts["Okay"] ?? 0, color: .blue, imageName: "okaycloud")
@@ -54,7 +52,6 @@ struct StatisticView: View {
         }
         .padding()
         .onAppear {
-            // Refresh the mood counts when the view appears
             self.moodCounts = fetchMoodCounts()
         }
     }
@@ -79,12 +76,12 @@ struct StatisticView: View {
                 .fontWeight(.light)
         }
     }
-
+    
     private func fetchMoodCounts() -> [String: Int] {
         let moodCounts = UserDefaults.standard.dictionary(forKey: moodCountsKey) as? [String: Int] ?? [:]
         return moodCounts
     }
-
+    
     private func fetchStreak() -> Int {
         return UserDefaults.standard.integer(forKey: "streak")
     }
