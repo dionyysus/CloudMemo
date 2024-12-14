@@ -207,7 +207,6 @@ struct HomeView: View {
     private func entryExistsForToday() -> Bool {
         var dailyEntries: [String: [String: Any]] = loadDailyEntries()
         return dailyEntries[today] != nil
-        
     }
     
     private func selectedMoodColor() -> Color {

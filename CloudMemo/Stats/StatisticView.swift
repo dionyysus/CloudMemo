@@ -9,15 +9,11 @@ import SwiftUI
 
 struct StatisticView: View {
     
-    private func fetchMoodCounts() -> [String: Int] {
-        let moodCountsKey = "moodCounts"
-        return UserDefaults.standard.dictionary(forKey: moodCountsKey) as? [String: Int] ?? [:]
-    }
+    let moodCountsKey = "moodCounts"
     
-    private func fetchStreak() -> Int {
-           return UserDefaults.standard.integer(forKey: "streak")
-       }
-    
+    // Use @State to store the mood counts locally
+    @State private var moodCounts: [String: Int] = [:]
+
     var body: some View {
         VStack {
             
@@ -26,9 +22,9 @@ struct StatisticView: View {
                 .scaledToFit()
                 .foregroundStyle(Color.orange)
                 .padding()
-            Text("\(fetchStreak())") // Display dynamic streak value
-                             .font(.title)
-                             .fontWeight(.bold)
+            Text("\(fetchStreak())")
+                .font(.title)
+                .fontWeight(.bold)
             Text("Day Streak")
                 .font(.title)
                 .fontWeight(.bold)
@@ -38,121 +34,16 @@ struct StatisticView: View {
             
             VStack(spacing: 20) {
                 HStack(spacing: 20) {
-                    VStack {
-                        ZStack(alignment: .topLeading) {
-                            Image("awesomecloud")
-                                .resizable()
-                                .scaledToFit()
-                            Text("\(fetchMoodCounts()["Awesome"] ?? 0)")
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .padding(4)
-                                .background(Color.green.opacity(0.5))
-                                .foregroundColor(.white)
-                                .clipShape(Circle())
-                                .padding([.top, .leading], 5)
-                        }
-                        Text("Awesome")
-                            .font(.caption)
-                            .fontWeight(.light)
-                    }
-                    
-                    VStack {
-                        ZStack(alignment: .topLeading) {
-                            Image("happycloud")
-                                .resizable()
-                                .scaledToFit()
-                            Text("\(fetchMoodCounts()["Happy"] ?? 0)")  // Dynamically show the count for "Happy"
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .padding(4)
-                                .background(Color.yellow.opacity(0.5))
-                                .foregroundColor(.white)
-                                .clipShape(Circle())
-                                .padding([.top, .leading], 5)
-                        }
-                        Text("Happy")
-                            .font(.caption)
-                            .fontWeight(.light)
-                    }
-                    
-                    VStack {
-                        ZStack(alignment: .topLeading) {
-                            Image("okaycloud")
-                                .resizable()
-                                .scaledToFit()
-                            Text("\(fetchMoodCounts()["Okay"] ?? 0)")  // Dynamically show the count for "Okay"
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .padding(4)
-                                .background(Color.blue.opacity(0.5))
-                                .foregroundColor(.white)
-                                .clipShape(Circle())
-                                .padding([.top, .leading], 5)
-                        }
-                        Text("Okay")
-                            .font(.caption)
-                            .fontWeight(.light)
-                    }
+                    // Repeat the same structure for other moods
+                    moodCloud(mood: "Awesome", count: moodCounts["Awesome"] ?? 0, color: .green, imageName: "awesomecloud")
+                    moodCloud(mood: "Happy", count: moodCounts["Happy"] ?? 0, color: .yellow, imageName: "happycloud")
+                    moodCloud(mood: "Okay", count: moodCounts["Okay"] ?? 0, color: .blue, imageName: "okaycloud")
                 }
                 
                 HStack(spacing: 20) {
-                    VStack {
-                        ZStack(alignment: .topLeading) {
-                            Image("sadcloud")
-                                .resizable()
-                                .scaledToFit()
-                            Text("\(fetchMoodCounts()["Sad"] ?? 0)")
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .padding(4)
-                                .background(Color.purple.opacity(0.5))
-                                .foregroundColor(.white)
-                                .clipShape(Circle())
-                                .padding([.top, .leading], 5)
-                        }
-                        Text("Sad")
-                            .font(.caption)
-                            .fontWeight(.light)
-                    }
-                    
-                    VStack {
-                        ZStack(alignment: .topLeading) {
-                            Image("angrycloud")
-                                .resizable()
-                                .scaledToFit()
-                            Text("\(fetchMoodCounts()["Angry"] ?? 0)")
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .padding(4)
-                                .background(Color.red.opacity(0.5))
-                                .foregroundColor(.white)
-                                .clipShape(Circle())
-                                .padding([.top, .leading], 5)
-                        }
-                        Text("Angry")
-                            .font(.caption)
-                            .fontWeight(.light)
-                    }
-                    
-                    VStack {
-                        ZStack(alignment: .topLeading) {
-                            Image("terriblecloud")
-                                .resizable()
-                                .scaledToFit()
-                            Text("\(fetchMoodCounts()["Terrible"] ?? 0)")  // Dynamically show the count for "Terrible"
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .padding(4)
-                                .background(Color.pink.opacity(0.5))
-                                .foregroundColor(.white)
-                                .clipShape(Circle())
-                                .padding([.top, .leading], 5)
-                        }
-                        Text("Terrible")
-                            .font(.caption)
-                            .fontWeight(.light)
-                    }
+                    moodCloud(mood: "Sad", count: moodCounts["Sad"] ?? 0, color: .purple, imageName: "sadcloud")
+                    moodCloud(mood: "Angry", count: moodCounts["Angry"] ?? 0, color: .red, imageName: "angrycloud")
+                    moodCloud(mood: "Terrible", count: moodCounts["Terrible"] ?? 0, color: .pink, imageName: "terriblecloud")
                 }
             }
             .padding()
@@ -162,11 +53,43 @@ struct StatisticView: View {
             )
         }
         .padding()
-        
+        .onAppear {
+            // Refresh the mood counts when the view appears
+            self.moodCounts = fetchMoodCounts()
+        }
+    }
+    
+    private func moodCloud(mood: String, count: Int, color: Color, imageName: String) -> some View {
+        VStack {
+            ZStack(alignment: .topLeading) {
+                Image(imageName)
+                    .resizable()
+                    .scaledToFit()
+                Text("\(count)")
+                    .font(.caption)
+                    .fontWeight(.bold)
+                    .padding(4)
+                    .background(color.opacity(0.5))
+                    .foregroundColor(.white)
+                    .clipShape(Circle())
+                    .padding([.top, .leading], 5)
+            }
+            Text(mood)
+                .font(.caption)
+                .fontWeight(.light)
+        }
+    }
+
+    private func fetchMoodCounts() -> [String: Int] {
+        let moodCounts = UserDefaults.standard.dictionary(forKey: moodCountsKey) as? [String: Int] ?? [:]
+        return moodCounts
+    }
+
+    private func fetchStreak() -> Int {
+        return UserDefaults.standard.integer(forKey: "streak")
     }
 }
 
 #Preview {
     StatisticView()
 }
-
