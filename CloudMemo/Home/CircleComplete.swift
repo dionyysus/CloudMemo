@@ -9,20 +9,16 @@ import SwiftUI
 
 struct CircleComplete: View {
     @State private var drawingStroke = false
-    
     let selectedColor: Color
-    
-    let animation = Animation
-        .easeOut(duration: 1)
-        .delay(0.1)
-    
+    let animation = Animation.easeOut(duration: 1)
+
     var body: some View {
         ZStack {
             ring(for: selectedColor)
             VStack(spacing: 10) {
                 Image(systemName: "checkmark.icloud.fill")
                     .font(.system(size: 50))
-                
+                    .foregroundColor(selectedColor) // Apply selected color to the checkmark
                 Text("Another journal entry down!")
                     .multilineTextAlignment(.center)
                     .font(.caption)
@@ -35,20 +31,23 @@ struct CircleComplete: View {
         }
         .navigationBarBackButtonHidden(true)
     }
-    
+
     func ring(for color: Color) -> some View {
         Circle()
-            .stroke(style: StrokeStyle(lineWidth: 16))
+            .stroke(style: StrokeStyle(lineWidth: 16, lineCap: .round))
             .foregroundStyle(.tertiary)
             .overlay {
                 Circle()
                     .trim(from: 0, to: drawingStroke ? 1 : 0)
-                    .stroke(color.gradient,
-                            style: StrokeStyle(lineWidth: 16, lineCap: .round))
+                    .stroke(color.gradient, style: StrokeStyle(lineWidth: 16, lineCap: .round))
             }
             .rotationEffect(.degrees(-90))
     }
+
 }
+
+
+
 
 #Preview {
     CircleComplete(selectedColor: .green)
