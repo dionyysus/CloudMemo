@@ -112,72 +112,68 @@ struct MemoriesView: View {
 }
 
 struct MoodDetailView: View {
-    var date: Date
-    @State private var displayedText: String = ""
-    @State private var selectedMood: Int? = nil
+    let date: Date
+    
+    @State private var moodText: String = ""
+    @State private var mood: Int = -1
     
     private let dataKey = "dailyEntries"
-    private let items = [
-        ("awesomecloud", "Awesome", Color.green),
-        ("happycloud", "Happy", Color.yellow),
-        ("okaycloud", "Okay", Color.blue),
-        ("sadcloud", "Sad", Color.purple),
-        ("angrycloud", "Angry", Color.red),
-        ("terriblecloud", "Terrible", Color.pink)
-    ]
     
     var body: some View {
         VStack {
-            Text("Mood Details for \(formattedDate(date))")
+            Text(formattedDate(from: date))
                 .font(.title)
                 .padding()
             
-            if let mood = selectedMood {
-                Text("Mood: \(items[mood].1)")
-                    .font(.title2)
-                    .padding()
-            } else {
-                Text("No mood selected.")
-                    .font(.title2)
-                    .padding()
-            }
-            
-            if !displayedText.isEmpty {
-                Text("Text Entry:")
+            if mood >= 0 {
+                Text("Mood: \(moodDescription(for: mood))")
                     .font(.headline)
-                    .padding(.top)
-                Text(displayedText)
-                    .font(.body)
-                    .padding()
-            } else {
-                Text("No text entry for today.")
-                    .font(.body)
                     .padding()
             }
             
-            Spacer()
+            if !moodText.isEmpty {
+                Text("Entry: \(moodText)")
+                    .padding()
+            }
         }
-        .navigationTitle("Mood Details")
-        .padding()
         .onAppear {
-            loadDailyEntryData()
+            loadMoodData(for: date)
         }
     }
     
-    private func loadDailyEntryData() {
-        let formattedDate = formattedDate(date)
+    private func loadMoodData(for date: Date) {
+        let formattedDate = formattedDate(from: date)
         let dailyEntries = UserDefaults.standard.dictionary(forKey: dataKey) as? [String: [String: Any]] ?? [:]
         
         if let entry = dailyEntries[formattedDate] {
-            displayedText = entry["text"] as? String ?? ""
-            selectedMood = entry["mood"] as? Int
+            mood = entry["mood"] as? Int ?? -1
+            moodText = entry["text"] as? String ?? ""
         }
     }
     
-    private func formattedDate(_ date: Date) -> String {
+    private func formattedDate(from date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMMM dd, yyyy"
+        formatter.dateFormat = "yyyy-MM-dd"
         return formatter.string(from: date)
+    }
+    
+    private func moodDescription(for mood: Int) -> String {
+        switch mood {
+        case 0:
+            return "Awesome"
+        case 1:
+            return "Happy"
+        case 2:
+            return "Okay"
+        case 3:
+            return "Sad"
+        case 4:
+            return "Angry"
+        case 5:
+            return "Terrible"
+        default:
+            return "Unknown"
+        }
     }
 }
 
