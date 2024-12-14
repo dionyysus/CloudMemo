@@ -14,6 +14,13 @@ struct HomeView: View {
     @State private var today: String = ""
     @FocusState private var isTextEditorFocused: Bool
     
+    @State private var moodCounts: [String: Int] = [:]
+    
+    @State private var streak: Int = 0
+    
+    @State private var navigateToCircleComplete: Bool = false // New state for navigation
+
+    
     private let dataKey = "dailyEntries"
     
     let items = [
@@ -90,7 +97,7 @@ struct HomeView: View {
                 .padding()
                 .disabled(entryExistsForToday())
                 
-                NavigationLink(destination: CircleComplete(selectedColor: selectedMoodColor())) {
+                NavigationLink(destination: CircleComplete(selectedColor: selectedMoodColor()), isActive: $navigateToCircleComplete) {
                     Text("Add".uppercased())
                         .font(.caption)
                         .fontWeight(.bold)
@@ -105,6 +112,7 @@ struct HomeView: View {
                 .padding()
                 .simultaneousGesture(TapGesture().onEnded {
                     saveDataForToday()
+                    navigateToCircleComplete = true
                 })
                 .disabled(entryExistsForToday())
                 
@@ -119,6 +127,9 @@ struct HomeView: View {
             }
             .onAppear {
                 setupToday()
+                loadMoodCounts()
+                streak = UserDefaults.standard.integer(forKey: "streak") // Load streak
+                navigateToCircleComplete = entryExistsForToday()
             }
         }
     }
@@ -130,32 +141,37 @@ struct HomeView: View {
     }
     
     private func saveDataForToday() {
-        // Save daily entry data
         var dailyEntries = UserDefaults.standard.dictionary(forKey: dataKey) as? [String: [String: Any]] ?? [:]
+        let previousDay = Calendar.current.date(byAdding: .day, value: -1, to: Date())
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        let yesterday = formatter.string(from: previousDay ?? Date())
+        
+        if dailyEntries[today] == nil {
+            // Update streak logic
+            if dailyEntries[yesterday] != nil {
+                streak += 1 // Continue streak
+            } else {
+                streak = 1 // Reset streak
+            }
+        }
+        
         dailyEntries[today] = [
             "text": displayedText,
             "mood": selectedMood ?? -1
         ]
         UserDefaults.standard.set(dailyEntries, forKey: dataKey)
+        UserDefaults.standard.set(streak, forKey: "streak") // Save streak
         
         // Update mood counts
-        let moodCountsKey = "moodCounts"
-        var moodCounts = UserDefaults.standard.dictionary(forKey: moodCountsKey) as? [String: Int] ?? [:]
-        
+        var moodCounts = UserDefaults.standard.dictionary(forKey: "moodCounts") as? [String: Int] ?? [:]
         if let selectedMood = selectedMood {
-            let moodName = items[selectedMood].1 // Get the name of the selected mood (e.g., "Awesome")
-            moodCounts[moodName, default: 0] += 1 // Increase the count for that mood
+            let moodName = items[selectedMood].1 // Get the name of the selected mood
+            moodCounts[moodName, default: 0] += 1
         }
-        
-        UserDefaults.standard.set(moodCounts, forKey: moodCountsKey)
+        UserDefaults.standard.set(moodCounts, forKey: "moodCounts")
         print("Mood counts updated: \(moodCounts)")
         print("Data saved for \(today): \(displayedText), Mood: \(selectedMood ?? -1)")
-    }
-
-    private func fetchMoodCounts() -> [String: Int] {
-        // Fetch mood counts from UserDefaults
-        let moodCountsKey = "moodCounts"
-        return UserDefaults.standard.dictionary(forKey: moodCountsKey) as? [String: Int] ?? [:]
     }
     
     private func entryExistsForToday() -> Bool {
@@ -163,10 +179,34 @@ struct HomeView: View {
         return dailyEntries[today] != nil
     }
     
-   
     private func selectedMoodColor() -> Color {
         guard let selectedMood = selectedMood else { return .gray }
         return items[selectedMood].2
+    }
+    
+    func saveMoodSelection(mood: String, color: UIColor) {
+        let moodKey = "selectedMood"
+        let colorKey = "selectedMoodColor"
+        
+        UserDefaults.standard.set(mood, forKey: moodKey)
+        UserDefaults.standard.set(try? NSKeyedArchiver.archivedData(withRootObject: color, requiringSecureCoding: false), forKey: colorKey)
+    }
+
+    
+    func saveMoodCounts() {
+        let moodCountsKey = "moodCounts"
+        
+        // Serialize dictionary to JSON
+        if let data = try? JSONEncoder().encode(moodCounts),
+           let jsonString = String(data: data, encoding: .utf8) {
+            UserDefaults.standard.set(jsonString, forKey: moodCountsKey)
+        }
+    }
+    
+    // Load mood counts from UserDefaults into the state
+    private func loadMoodCounts() {
+        let moodCountsKey = "moodCounts"
+        moodCounts = UserDefaults.standard.dictionary(forKey: moodCountsKey) as? [String: Int] ?? [:]
     }
 }
 

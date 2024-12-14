@@ -13,6 +13,10 @@ struct StatisticView: View {
         let moodCountsKey = "moodCounts"
         return UserDefaults.standard.dictionary(forKey: moodCountsKey) as? [String: Int] ?? [:]
     }
+    private func fetchStreak() -> Int {
+        return UserDefaults.standard.integer(forKey: "streak")
+    }
+
     
     var body: some View {
         VStack {
@@ -22,9 +26,9 @@ struct StatisticView: View {
                 .scaledToFit()
                 .foregroundStyle(Color.orange)
                 .padding()
-            Text("2")
-                .font(.title)
-                .fontWeight(.bold)
+            Text("\(fetchStreak())") // Display dynamic streak value
+                        .font(.title)
+                        .fontWeight(.bold)
             Text("Day Streak")
                 .font(.title)
                 .fontWeight(.bold)
@@ -158,6 +162,7 @@ struct StatisticView: View {
             )
         }
         .padding()
+        
     }
 }
 
