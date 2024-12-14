@@ -96,14 +96,17 @@ struct HomeView: View {
                 .padding()
                 .disabled(entryExistsForToday())
                 
-                NavigationLink(destination: CircleComplete(selectedColor: selectedMoodColor()), isActive: $navigateToCircleComplete) {
+                NavigationLink(destination: CircleComplete(selectedMoodColor: selectedMoodColor()), isActive: $navigateToCircleComplete) {
                     Text("Add".uppercased())
                         .font(.caption)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
                         .padding()
                         .padding(.horizontal, 10)
-                        .background(Capsule().fill(Color.black))
+                        .background(
+                            Capsule()
+                                .fill(Color.black)
+                        )
                 }
                 .simultaneousGesture(TapGesture().onEnded {
                     saveDataForToday()
@@ -183,20 +186,15 @@ struct HomeView: View {
     }
 
 
-    func loadMoodColor() -> Color {
-        if let colorData = UserDefaults.standard.data(forKey: "selectedMoodColor"),
-           let uiColor = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(colorData) as? UIColor {
-            return Color(uiColor)
+    func loadMoodCounts() {
+        if let moodCounts = UserDefaults.standard.dictionary(forKey: "moodCounts") as? [String: Int] {
+            self.moodCounts = moodCounts
+        } else {
+            self.moodCounts = [:]
         }
-        return .gray
-    }
-
-    // Load mood counts from UserDefaults into the state
-    private func loadMoodCounts() {
-        let moodCountsKey = "moodCounts"
-        moodCounts = UserDefaults.standard.dictionary(forKey: moodCountsKey) as? [String: Int] ?? [:]
     }
 }
+
 
 
 #Preview {

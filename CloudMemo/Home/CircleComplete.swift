@@ -9,16 +9,16 @@ import SwiftUI
 
 struct CircleComplete: View {
     @State private var drawingStroke = false
-    let selectedColor: Color
+    let selectedMoodColor: Color
     let animation = Animation.easeOut(duration: 1)
 
     var body: some View {
         ZStack {
-            ring(for: selectedColor)
+            ring(for: selectedMoodColor)
             VStack(spacing: 10) {
                 Image(systemName: "checkmark.icloud.fill")
                     .font(.system(size: 50))
-                    .foregroundColor(selectedColor) // Apply selected color to the checkmark
+                    .foregroundColor(selectedMoodColor)
                 Text("Another journal entry down!")
                     .multilineTextAlignment(.center)
                     .font(.caption)
@@ -43,12 +43,4 @@ struct CircleComplete: View {
             }
             .rotationEffect(.degrees(-90))
     }
-
-}
-
-
-
-
-#Preview {
-    CircleComplete(selectedColor: .green)
 }
