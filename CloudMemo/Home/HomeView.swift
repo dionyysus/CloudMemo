@@ -18,10 +18,11 @@ struct HomeView: View {
     
     @State private var streak: Int = 0
     
-    @State private var navigateToCircleComplete: Bool = false
-    
+    @State private var navigateToCircleComplete: Bool = false // New state for navigation
+
+
     private let dataKey = "dailyEntries"
-    
+
     let items = [
         ("awesomecloud", "Awesome", Color.green),
         ("happycloud", "Happy", Color.yellow),
@@ -96,7 +97,7 @@ struct HomeView: View {
                 .padding()
                 .disabled(entryExistsForToday())
                 
-                NavigationLink(destination: CircleComplete(selectedMoodColor: selectedMoodColor()), isActive: $navigateToCircleComplete) {
+                NavigationLink(destination: CircleComplete(selectedColor: selectedMoodColor()), isActive: $navigateToCircleComplete) {
                     Text("Add".uppercased())
                         .font(.caption)
                         .fontWeight(.bold)
@@ -108,12 +109,13 @@ struct HomeView: View {
                                 .fill(Color.black)
                         )
                 }
+
+                .padding()
                 .simultaneousGesture(TapGesture().onEnded {
                     saveDataForToday()
                     navigateToCircleComplete = true
                 })
                 .disabled(entryExistsForToday())
-
                 
                 if entryExistsForToday() {
                     Text("You've already added an entry for today!")
@@ -160,12 +162,17 @@ struct HomeView: View {
         
         dailyEntries[today] = [
             "text": displayedText,
-            "mood": selectedMood ?? -1,
-            "color": selectedMoodColor().description // Save the color as a string (e.g., for yellow: .yellow)
+            "mood": selectedMood ?? -1
         ]
         UserDefaults.standard.set(dailyEntries, forKey: dataKey)
         UserDefaults.standard.set(streak, forKey: "streak") // Save streak
 
+        // Save the selected mood color
+        if let selectedMood = selectedMood {
+            let colorData = try? NSKeyedArchiver.archivedData(withRootObject: UIColor(items[selectedMood].2), requiringSecureCoding: false)
+            UserDefaults.standard.set(colorData, forKey: "selectedMoodColor")
+        }
+        
         // Update mood counts
         var moodCounts = UserDefaults.standard.dictionary(forKey: "moodCounts") as? [String: Int] ?? [:]
         if let selectedMood = selectedMood {
@@ -173,6 +180,8 @@ struct HomeView: View {
             moodCounts[moodName, default: 0] += 1
         }
         UserDefaults.standard.set(moodCounts, forKey: "moodCounts")
+        print("Mood counts updated: \(moodCounts)")
+        print("Data saved for \(today): \(displayedText), Mood: \(selectedMood ?? -1)")
     }
 
     private func entryExistsForToday() -> Bool {
@@ -184,17 +193,41 @@ struct HomeView: View {
         guard let selectedMood = selectedMood else { return .gray }
         return items[selectedMood].2
     }
+    
+    func saveMoodSelection(mood: String, color: UIColor) {
+        let moodKey = "selectedMood"
+        let colorKey = "selectedMoodColor"
+        
+        UserDefaults.standard.set(mood, forKey: moodKey)
+        UserDefaults.standard.set(try? NSKeyedArchiver.archivedData(withRootObject: color, requiringSecureCoding: false), forKey: colorKey)
+    }
 
-
-    func loadMoodCounts() {
-        if let moodCounts = UserDefaults.standard.dictionary(forKey: "moodCounts") as? [String: Int] {
-            self.moodCounts = moodCounts
-        } else {
-            self.moodCounts = [:]
+    
+    func saveMoodCounts() {
+        let moodCountsKey = "moodCounts"
+        
+        // Serialize dictionary to JSON
+        if let data = try? JSONEncoder().encode(moodCounts),
+           let jsonString = String(data: data, encoding: .utf8) {
+            UserDefaults.standard.set(jsonString, forKey: moodCountsKey)
         }
     }
-}
+    
+    // Load mood counts from UserDefaults into the state
+    private func loadMoodCounts() {
+        let moodCountsKey = "moodCounts"
+        moodCounts = UserDefaults.standard.dictionary(forKey: moodCountsKey) as? [String: Int] ?? [:]
+    }
+    
+    private func loadMoodColor() -> Color {
+        if let colorData = UserDefaults.standard.data(forKey: "selectedMoodColor"),
+           let uiColor = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(colorData) as? UIColor {
+            return Color(uiColor)
+        }
+        return .gray // Default color
+    }
 
+}
 
 
 #Preview {
