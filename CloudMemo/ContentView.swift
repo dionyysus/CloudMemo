@@ -24,7 +24,7 @@ struct ContentView: View {
                 .tabItem {
                     Label("Memories", systemImage: "calendar")
                 }
-        }.tint(.blue)
+        }.tint(.black)
     }
 }
 
