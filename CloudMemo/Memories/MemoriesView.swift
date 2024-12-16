@@ -37,7 +37,7 @@ struct MemoriesView: View {
                 let days = daysInMonth(for: currentDate)
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 10) {
                     ForEach(days, id: \.self) { date in
-                        NavigationLink(destination: MoodDetailView(date: date)) {
+                        NavigationLink(destination: MemoryDetailView(date: date)) {
                             VStack(spacing: 5) {
                                 Circle()
                                     .fill(moodColor(for: date))
@@ -108,72 +108,6 @@ struct MemoriesView: View {
             return mood >= 0 && mood < moodColors.count ? moodColors[mood] : .gray
         }
         return .clear
-    }
-}
-
-struct MoodDetailView: View {
-    let date: Date
-    
-    @State private var moodText: String = ""
-    @State private var mood: Int = -1
-    
-    private let dataKey = "dailyEntries"
-    
-    var body: some View {
-        VStack {
-            Text(formattedDate(from: date))
-                .font(.title)
-                .padding()
-            
-            if mood >= 0 {
-                Text("Mood: \(moodDescription(for: mood))")
-                    .font(.headline)
-                    .padding()
-            }
-            
-            if !moodText.isEmpty {
-                Text("Entry: \(moodText)")
-                    .padding()
-            }
-        }
-        .onAppear {
-            loadMoodData(for: date)
-        }
-    }
-    
-    private func loadMoodData(for date: Date) {
-        let formattedDate = formattedDate(from: date)
-        let dailyEntries = UserDefaults.standard.dictionary(forKey: dataKey) as? [String: [String: Any]] ?? [:]
-        
-        if let entry = dailyEntries[formattedDate] {
-            mood = entry["mood"] as? Int ?? -1
-            moodText = entry["text"] as? String ?? ""
-        }
-    }
-    
-    private func formattedDate(from date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.string(from: date)
-    }
-    
-    private func moodDescription(for mood: Int) -> String {
-        switch mood {
-        case 0:
-            return "Awesome"
-        case 1:
-            return "Happy"
-        case 2:
-            return "Okay"
-        case 3:
-            return "Sad"
-        case 4:
-            return "Angry"
-        case 5:
-            return "Terrible"
-        default:
-            return "Unknown"
-        }
     }
 }
 

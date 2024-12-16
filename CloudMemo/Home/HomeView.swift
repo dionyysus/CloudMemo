@@ -112,12 +112,6 @@ struct HomeView: View {
                     navigateToCircleComplete = true
                 })
                 .disabled(entryExistsForToday())
-                
-                if entryExistsForToday() {
-                    Text("You've already added an entry for today!")
-                        .font(.caption)
-                        .foregroundColor(.red)
-                }
             }
             .onTapGesture {
                 isTextEditorFocused = false
@@ -131,10 +125,10 @@ struct HomeView: View {
                     selectedMood = selectedMoodIndex
                     navigateToCircleComplete = true
                 }
+                saveImagesToUserDefaults()
             }
         }
     }
-   
     
     private func setupToday() {
         today = formattedDate(from: Date())
@@ -153,7 +147,7 @@ struct HomeView: View {
         saveMoodColor()
         updateMoodCounts()
     }
-
+    
     private func updateMoodCounts() {
         var moodCounts: [String: Int] = UserDefaults.standard.dictionary(forKey: "moodCounts") as? [String: Int] ?? [:]
         
@@ -164,23 +158,37 @@ struct HomeView: View {
         
         UserDefaults.standard.set(moodCounts, forKey: "moodCounts")
     }
-
+    
     private func saveDailyEntry(_ dailyEntries: inout [String: [String: Any]]) {
-        let entry: [String: Any] = [
+        var entry: [String: Any] = [
             "text": displayedText,
-            "mood": selectedMood ?? -1
+            "mood": selectedMood ?? -1,
         ]
+        
         dailyEntries[today] = entry
         UserDefaults.standard.set(dailyEntries, forKey: dataKey)
+        print("Daily entry saved successfully!")
     }
-
+    
     private func updateStreak(dailyEntries: [String: [String: Any]], yesterday: String) {
         if dailyEntries[today] == nil {
             streak = dailyEntries[yesterday] != nil ? streak + 1 : 1
         }
         UserDefaults.standard.set(streak, forKey: "streak")
     }
+    
+    func saveImagesToUserDefaults() {
+        let itemNames = items.map { $0.0 }
+        UserDefaults.standard.set(itemNames, forKey: "savedImageNames")
+    }
 
+    func loadSavedImages() -> [String] {
+        guard let savedItemNames = UserDefaults.standard.array(forKey: "savedImageNames") as? [String] else {
+            return []
+        }
+        return savedItemNames
+    }
+    
     private func saveMoodColor() {
         guard let selectedMood = selectedMood else { return }
         let moodColor = UIColor(items[selectedMood].2)
@@ -190,10 +198,17 @@ struct HomeView: View {
         } catch {
             colorData = nil
         }
-
         UserDefaults.standard.set(colorData, forKey: "selectedMoodColor")
     }
-
+    
+    private func loadMoodColor() -> Color {
+        if let colorData = UserDefaults.standard.data(forKey: "selectedMoodColor"),
+           let uiColor = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(colorData) as? UIColor {
+            return Color(uiColor)
+        }
+        return .gray
+    }
+    
     private func formattedDate(from date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
@@ -217,14 +232,6 @@ struct HomeView: View {
     private func loadMoodCounts() {
         let moodCountsKey = "moodCounts"
         moodCounts = UserDefaults.standard.dictionary(forKey: moodCountsKey) as? [String: Int] ?? [:]
-    }
-    
-    private func loadMoodColor() -> Color {
-        if let colorData = UserDefaults.standard.data(forKey: "selectedMoodColor"),
-           let uiColor = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(colorData) as? UIColor {
-            return Color(uiColor)
-        }
-        return .gray
     }
 }
 
