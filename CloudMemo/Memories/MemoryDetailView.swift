@@ -13,54 +13,43 @@ struct MemoryDetailView: View {
     
     var body: some View {
         VStack(spacing: 20) {
-            HStack(alignment: .top, spacing: 10) {
+            if mood >= 0 {
+                Image(moodImageName(for: mood))
+                    .resizable()
+                    .scaledToFit()
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                
                 Text(formattedDate(from: date))
                     .font(.system(size: 22, weight: .light))
                     .foregroundColor(.primary)
                     .scaleEffect(scale)
                     .opacity(opacity)
-                Spacer()
                 
-                VStack(alignment: .leading, spacing: 10) {
-                    if mood >= 0 {
-                        Image(moodImageName(for: mood))
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 50, height: 50)
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                        
-                        Text(moodDescription(for: mood))
-                            .font(.title3)
-                            .foregroundColor(moodColor(for: mood))
-                            .padding(.vertical, 10)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(moodColor(for: mood))
-                                    .background(RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.2)))
-                            )
-                    }
-                    
-                    if !moodText.isEmpty {
-                        Text(moodText)
-                            .font(.title3)
-                            .foregroundColor(moodColor(for: mood))
-                            .padding(.vertical, 10)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(moodColor(for: mood))
-                                    .background(RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.2)))
-                            )
-                    }
+                Text(moodDescription(for: mood))
+                    .font(.title)
+                    .foregroundColor(moodColor(for: mood))
+                    .padding(.vertical, 10)
+                    .frame(maxWidth: .infinity, alignment: .center)
+            }
+            
+            VStack{
+                if !moodText.isEmpty {
+                    Text(moodText)
+                        .font(.title3)
+                        .foregroundColor(moodColor(for: mood))
+                        .padding(.vertical, 10)
+                        .frame(maxWidth: .infinity, alignment: .center)
                 }
             }
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color.gray, lineWidth: 2)
+            )
             Spacer()
         }
         .padding(20)
-        .background(Color.gray.opacity(0.2))
         .cornerRadius(10)
-        .frame(maxWidth: .infinity, alignment: .top)
         .padding()
         .onAppear {
             loadMoodData(for: date)
@@ -136,7 +125,7 @@ struct MemoryDetailView: View {
         case 5:
             return "terriblecloud"
         default:
-            return "cloud" // Default image if mood is unknown
+            return "cloud"
         }
     }
 }
