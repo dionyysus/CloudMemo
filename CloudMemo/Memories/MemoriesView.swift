@@ -10,9 +10,11 @@ import CloudKit
 
 struct MemoriesView: View {
     let calendar = Calendar.current
+    var date: Date = Date()
     @State private var currentDate = Date()
     @State private var animate = false
     @State private var rotation: CGFloat = 0.0
+    @State private var mood: Int = -1
     
     private let dataKey = "dailyEntries"
     
@@ -37,7 +39,24 @@ struct MemoriesView: View {
                 let days = daysInMonth(for: currentDate)
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 10) {
                     ForEach(days, id: \.self) { date in
-                        NavigationLink(destination: MemoryDetailView(date: date)) {
+                        if moodColor(for: date) != .clear {
+                            NavigationLink(destination: MemoryDetailView(date: date)) {
+                                VStack(spacing: 5) {
+                                    Circle()
+                                        .fill(moodColor(for: date))
+                                        .frame(width: 30, height: 30)
+                                        .overlay(
+                                            Circle()
+                                                .stroke(Color.gray.opacity(0.7), lineWidth: 2)
+                                        )
+                                    Text("\(calendar.component(.day, from: date))")
+                                        .font(.footnote)
+                                        .foregroundColor(.primary)
+                                }
+                                .padding(5)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        } else {
                             VStack(spacing: 5) {
                                 Circle()
                                     .fill(moodColor(for: date))
@@ -46,14 +65,12 @@ struct MemoriesView: View {
                                         Circle()
                                             .stroke(Color.gray.opacity(0.7), lineWidth: 2)
                                     )
-                                
                                 Text("\(calendar.component(.day, from: date))")
                                     .font(.footnote)
                                     .foregroundColor(.primary)
                             }
                             .padding(5)
                         }
-                        .buttonStyle(PlainButtonStyle())
                     }
                 }
                 .padding()
@@ -73,10 +90,26 @@ struct MemoriesView: View {
             )
             .onAppear {
                 rotation = 360
+                loadMoodData(for: date)
+
             }
             .padding()
         }
     }
+    private func loadMoodData(for date: Date) {
+        let formattedDate = formattedDate(date)
+        let dailyEntries = UserDefaults.standard.dictionary(forKey: dataKey) as? [String: [String: Any]] ?? [:]
+        
+        if let entry = dailyEntries[formattedDate] {
+            mood = entry["mood"] as? Int ?? -1
+        }
+    }
+    
+//    private func formattedDate(from date: Date) -> String {
+//        let formatter = DateFormatter()
+//        formatter.dateFormat = "yyyy-MM-dd"
+//        return formatter.string(from: date)
+//    }
     
     private func daysInMonth(for date: Date) -> [Date] {
         guard let monthInterval = calendar.dateInterval(of: .month, for: date) else { return [] }
@@ -109,6 +142,8 @@ struct MemoriesView: View {
         }
         return .clear
     }
+
+    
 }
 
 
