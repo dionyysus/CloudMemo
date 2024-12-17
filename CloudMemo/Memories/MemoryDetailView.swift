@@ -2,7 +2,7 @@ import SwiftUI
 import CloudKit
 
 struct MemoryDetailView: View {
-    let date: Date
+    var date: Date = Date()
     
     @State private var moodText: String = ""
     @State private var mood: Int = -1
@@ -12,14 +12,15 @@ struct MemoryDetailView: View {
     private let dataKey = "dailyEntries"
     
     var body: some View {
-        VStack(spacing: 20) {
+        
+        VStack(spacing: 5) {
             if mood >= 0 {
                 Image(moodImageName(for: mood))
                     .resizable()
                     .scaledToFit()
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                 
-                Text(formattedDate(from: date))
+                Text(date, format: .dateTime.day().month().year())
                     .font(.system(size: 22, weight: .light))
                     .foregroundColor(.primary)
                     .scaleEffect(scale)
@@ -28,11 +29,11 @@ struct MemoryDetailView: View {
                 Text(moodDescription(for: mood))
                     .font(.title)
                     .foregroundColor(moodColor(for: mood))
-                    .padding(.vertical, 10)
+                    .padding()
                     .frame(maxWidth: .infinity, alignment: .center)
             }
             
-            VStack{
+            VStack {
                 if !moodText.isEmpty {
                     Text(moodText)
                         .font(.title3)
@@ -43,9 +44,11 @@ struct MemoryDetailView: View {
             }
             .padding()
             .background(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(Color.gray, lineWidth: 2)
+                RoundedRectangle(cornerRadius: 15)
+                    .fill(Color.white) // Background color
+                    .shadow(color: .gray, radius: 5, x: 0, y: 2) // Shadow applied to background
             )
+
             Spacer()
         }
         .padding(20)
@@ -130,8 +133,6 @@ struct MemoryDetailView: View {
     }
 }
 
-struct MemoryDetailView_Previews: PreviewProvider {
-    static var previews: some View {
-        MemoryDetailView(date: Date())
-    }
+#Preview {
+    MemoryDetailView()
 }

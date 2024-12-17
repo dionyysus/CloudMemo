@@ -221,6 +221,7 @@ struct HomeView: View {
     
     private func entryExistsForToday() -> Bool {
         var dailyEntries: [String: [String: Any]] = loadDailyEntries()
+//        UserDefaults.standard.removeObject(forKey: dataKey)
         return dailyEntries[today] != nil
     }
     
