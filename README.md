@@ -1,4 +1,4 @@
-![IMG_7984](https://github.com/user-attachments/assets/99454768-4c1c-4f9d-b97e-5a893aabdfe7)# ☁️ Cloud Memo
+# ☁️ Cloud Memo
 
 **Cloud Memo** CloudMemo is your personal space to reflect, express, and track your emotions. Take a moment anytime during your day to reflect on your feelings by writing them down and selecting a mood that resonates with you. Once you’ve added your entry, it’s locked in as a unique moment, allowing you to focus on that one meaningful reflection each day. 
 
