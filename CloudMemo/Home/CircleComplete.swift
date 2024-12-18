@@ -18,24 +18,32 @@ struct CircleComplete: View {
     var body: some View {
         ZStack {
             ring(for: selectedColor)
-            
+                .accessibilityHidden(true)
+
             VStack(spacing: 5) {
                 Image(systemName: "checkmark.icloud.fill")
                     .font(.system(size: 40))
                     .foregroundColor(selectedColor)
+                    .accessibilityLabel("Complete icon")
+                    .accessibilityValue("Journal entry complete")
+                    .accessibilityHint("Checkmark icon indicating that the journal entry is complete")
                 
                 Text("Journal entry complete!")
                     .font(.subheadline)
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.center)
+                    .accessibilityLabel("Journal entry complete!")
             }
         }
         .padding(40)
         .animation(animation, value: drawingStroke)
         .onAppear {
             drawingStroke.toggle()
+            announceCompletion()
         }
         .navigationBarBackButtonHidden(true)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Journal entry complete with a checkmark icon")
     }
     
     func ring(for color: Color) -> some View {
@@ -50,6 +58,10 @@ struct CircleComplete: View {
             }
             .rotationEffect(.degrees(-90))
     }
+    
+    private func announceCompletion() {
+            UIAccessibility.post(notification: .announcement, argument: "Journal entry marked as complete.")
+        }
 }
 
 #Preview {
