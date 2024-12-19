@@ -12,14 +12,6 @@
 
 ---
 
-## 📷 Screenshots
-
-<img src="https://github.com/user-attachments/assets/98adb7a6-626c-4f43-ba9e-7c31210acc71" width="200">
-<img src="https://github.com/user-attachments/assets/e399b9c9-dbb0-44b9-b0bd-f9bddbd638fd" width="200">
-<img src="https://github.com/user-attachments/assets/0b1dcfbe-c5d6-4120-8664-107bca52c3b9" width="200">
-<img src="https://github.com/user-attachments/assets/7e6970f7-876c-405d-b624-ddabeb3378eb" width="200">
-<img src="https://github.com/user-attachments/assets/5b5ffed4-efb9-495d-bb84-668c324e8d17" width="200">
-
 ## 📗 How It Works
 
 1. **Express Your Feelings**: Open the app and write about how you're feeling using the text editor. Share your thoughts, emotions, or anything on your mind.
@@ -55,3 +47,13 @@ Contributions are welcome! To contribute:
    git push origin feature/your-feature-name
    ```
 4. Open a pull request.
+
+---
+
+## 📷 Screenshots
+
+<img src="https://github.com/user-attachments/assets/98adb7a6-626c-4f43-ba9e-7c31210acc71" width="200">
+<img src="https://github.com/user-attachments/assets/e399b9c9-dbb0-44b9-b0bd-f9bddbd638fd" width="200">
+<img src="https://github.com/user-attachments/assets/0b1dcfbe-c5d6-4120-8664-107bca52c3b9" width="200">
+<img src="https://github.com/user-attachments/assets/7e6970f7-876c-405d-b624-ddabeb3378eb" width="200">
+<img src="https://github.com/user-attachments/assets/5b5ffed4-efb9-495d-bb84-668c324e8d17" width="200">
